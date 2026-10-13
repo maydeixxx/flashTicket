@@ -1,6 +1,6 @@
 package com.FlashTicket.UserService.api;
 
-import com.FlashTicket.UserService.models.dtos.UserDto;
+import com.FlashTicket.UserService.models.dtos.UserDTO;
 import com.FlashTicket.UserService.models.dtos.UserUpdateDTO;
 import com.FlashTicket.UserService.services.UserService;
 import jakarta.validation.Valid;
@@ -17,7 +17,7 @@ public class UserController {
 
     @GetMapping("/{email}")
     @PreAuthorize("isAuthenticated() and (hasRole('ADMIN') or authentication.principal.email == #email)")
-    public ResponseEntity<UserDto> getUser(@PathVariable String email) {
+    public ResponseEntity<UserDTO> getUser(@PathVariable String email) {
         return ResponseEntity.ok(userService.getUser(email));
     }
 

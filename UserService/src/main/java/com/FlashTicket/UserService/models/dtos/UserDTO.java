@@ -5,7 +5,7 @@ import com.FlashTicket.UserService.models.domain.enums.Role;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record UserDto(
+public record UserDTO(
         UUID id,
         String email,
         Role role,

@@ -1,7 +1,7 @@
 package com.FlashTicket.UserService.services;
 
 import com.FlashTicket.UserService.models.domain.UserDomain;
-import com.FlashTicket.UserService.models.dtos.UserDto;
+import com.FlashTicket.UserService.models.dtos.UserDTO;
 import com.FlashTicket.UserService.models.dtos.UserUpdateDTO;
 import com.FlashTicket.UserService.models.entity.User;
 import com.FlashTicket.UserService.models.exceptions.UserExistsException;
@@ -93,7 +93,7 @@ public class UserService {
         }
     }
 
-    public UserDto getUser(String email) {
+    public UserDTO getUser(String email) {
         try {
             return userMapper.entityToDto(userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User [%s] not found".formatted(email))));
         } catch (UserNotFoundException e) {
