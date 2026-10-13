@@ -1,8 +1,7 @@
 package com.FlashTicket.UserService.models.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import com.FlashTicket.UserService.models.domain.enums.Role;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,6 +21,9 @@ public class User {
     private String email;
     @Column(nullable = false)
     private String passwordHash;
+
+    @Enumerated(value = EnumType.STRING)
+    private Role role;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
