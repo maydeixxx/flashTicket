@@ -42,15 +42,41 @@ public class UserService {
         }
     }
 
-    public void updateUser(String type, UserUpdateDTO userUpdateDTO) {
+    public void updateUser(UserUpdateDTO userUpdateDTO) {
         try {
             UserDomain user = userMapper.entityToDomain(userRepository.findByEmail(userUpdateDTO.email()).orElseThrow(() -> new UserNotFoundException("User [%s] not found".formatted(userUpdateDTO.email()))));
-            UserUpdateStrategy strategy = updateStrategyMap.get(type.toLowerCase().trim());
+            UserUpdateStrategy strategy = updateStrategyMap.get(userUpdateDTO.type().toLowerCase().trim());
             strategy.updateUser(user, userUpdateDTO);
         } catch (IllegalArgumentException | UserExistsException e) {
             throw e;
         } catch (Exception e) {
             log.error("Unexpected error updating user [{}]: {}", userUpdateDTO.email(), e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void upgradeUser(String email) {
+        try {
+            UserDomain user = userMapper.entityToDomain(userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User [%s] not found".formatted(email))));
+            user.upgradeUser();
+            userRepository.save(userMapper.domainToEntity(user));
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error upgrading user [{}]: {}", email, e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void downgradeUser(String email) {
+        try {
+            UserDomain user = userMapper.entityToDomain(userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User [%s] not found".formatted(email))));
+            user.downgradeUser();
+            userRepository.save(userMapper.domainToEntity(user));
+        } catch (UserNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error downgrading user [{}]: {}", email, e.getMessage());
             throw new RuntimeException(e);
         }
     }
