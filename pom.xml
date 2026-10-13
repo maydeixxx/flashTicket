@@ -11,6 +11,10 @@
 	<groupId>com.FlashTicket</groupId>
 	<artifactId>FlashTicket</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<modules>
+		<module>UserService</module>
+	</modules>
 	<name/>
 	<description/>
 	<url/>
