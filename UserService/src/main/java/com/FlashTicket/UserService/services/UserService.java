@@ -46,6 +46,7 @@ public class UserService {
         try {
             UserDomain user = userMapper.entityToDomain(userRepository.findByEmail(userUpdateDTO.email()).orElseThrow(() -> new UserNotFoundException("User [%s] not found".formatted(userUpdateDTO.email()))));
             UserUpdateStrategy strategy = updateStrategyMap.get(userUpdateDTO.type().toLowerCase().trim());
+            if (strategy == null) throw new IllegalArgumentException("Unknown type of update");
             strategy.updateUser(user, userUpdateDTO);
         } catch (IllegalArgumentException | UserExistsException e) {
             throw e;

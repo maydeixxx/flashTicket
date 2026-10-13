@@ -4,6 +4,7 @@ import com.FlashTicket.UserService.models.domain.UserDomain;
 import com.FlashTicket.UserService.models.dtos.AuthDTO;
 import com.FlashTicket.UserService.models.entity.User;
 import com.FlashTicket.UserService.models.exceptions.AuthenticationErrorException;
+import com.FlashTicket.UserService.models.exceptions.UserExistsException;
 import com.FlashTicket.UserService.models.exceptions.UserNotFoundException;
 import com.FlashTicket.UserService.services.misc.UserMapper;
 import com.FlashTicket.UserService.services.misc.UserRepository;
@@ -11,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -25,11 +28,14 @@ public class AuthService {
     public String registerUser(AuthDTO newUser) {
         try {
             String encodedPassword = passwordEncoder.encode(newUser.password());
+            Optional<User> byEmail = userRepository.findByEmail(newUser.email());
+            if (byEmail.isPresent()) throw new UserExistsException("Email %s already in use, please use another one");
+
             UserDomain user = UserDomain.createUser(newUser.email(), encodedPassword);
             userService.saveUser(userMapper.domainToEntity(user));
 
-            return jwtService.generateToken(user.getEmail(), user.getRole());
-        } catch (IllegalArgumentException e) {
+            return jwtService.generateToken(user.getEmail(), user.getRole(), user.getId().value());
+        } catch (IllegalArgumentException | UserExistsException e) {
             throw e;
         } catch (Exception e) {
             log.error("Unexpected error registering user [{}]: {}", newUser.email(), e.getMessage());
@@ -43,10 +49,10 @@ public class AuthService {
             String passwordHash = user.getPasswordHash();
             String rawPassword = loginUser.password();
 
-            if (passwordEncoder.matches(rawPassword, passwordHash))
+            if (!passwordEncoder.matches(rawPassword, passwordHash))
                 throw new AuthenticationErrorException("Password is incorrect");
 
-            return jwtService.generateToken(user.getEmail(), user.getRole());
+            return jwtService.generateToken(user.getEmail(), user.getRole(), user.getId());
         } catch (UserNotFoundException | AuthenticationErrorException e) {
             throw e;
         } catch (Exception e) {

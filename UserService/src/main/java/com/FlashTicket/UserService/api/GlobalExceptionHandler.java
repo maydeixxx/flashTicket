@@ -24,6 +24,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(errorResponse.code()).body(errorResponse);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponseDTO> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+        ErrorResponseDTO errorResponse = buildErrorResponse("Illegal argument", ex.getMessage(), 400, request);
+        return ResponseEntity.status(errorResponse.code()).body(errorResponse);
+    }
+
     @ExceptionHandler(UserExistsException.class)
     public ResponseEntity<ErrorResponseDTO> handleUserExistsException(UserExistsException ex, WebRequest request) {
         ErrorResponseDTO errorResponse = buildErrorResponse("User exists", ex.getMessage(), 409, request);

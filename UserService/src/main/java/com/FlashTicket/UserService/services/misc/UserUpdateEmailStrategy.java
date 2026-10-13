@@ -34,6 +34,7 @@ public class UserUpdateEmailStrategy implements UserUpdateStrategy {
             throw e;
         } catch (Exception e) {
             log.error("Unexpected error updating email [{}]: {}", userDomain.getEmail(), e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }

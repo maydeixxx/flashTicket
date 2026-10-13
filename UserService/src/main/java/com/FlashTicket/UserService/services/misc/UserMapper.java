@@ -23,6 +23,7 @@ public class UserMapper {
         user.setId(domain.getId().value());
         user.setEmail(domain.getEmail());
         user.setPasswordHash(domain.getPasswordHash());
+        user.setRole(domain.getRole());
         user.setCreatedAt(domain.getCreatedAt());
         user.setUpdatedAt(domain.getUpdatedAt());
         return user;

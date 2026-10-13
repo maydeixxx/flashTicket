@@ -21,7 +21,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getUser(email));
     }
 
-    @PutMapping("/update/{email}")
+    @PutMapping("/update")
     @PreAuthorize("isAuthenticated() and (hasRole('ADMIN') or authentication.principal.email == #userUpdateDTO.email())")
     public ResponseEntity<Void> updateUser(@RequestBody @Valid UserUpdateDTO userUpdateDTO) {
         userService.updateUser(userUpdateDTO);
