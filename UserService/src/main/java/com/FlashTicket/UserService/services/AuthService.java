@@ -5,6 +5,7 @@ import com.FlashTicket.UserService.models.dtos.AuthDTO;
 import com.FlashTicket.UserService.models.entity.User;
 import com.FlashTicket.UserService.models.exceptions.AuthenticationErrorException;
 import com.FlashTicket.UserService.models.exceptions.UserNotFoundException;
+import com.FlashTicket.UserService.services.misc.UserMapper;
 import com.FlashTicket.UserService.services.misc.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
     private final JwtService jwtService;
+    private final UserService userService;
+    private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -23,6 +26,8 @@ public class AuthService {
         try {
             String encodedPassword = passwordEncoder.encode(newUser.password());
             UserDomain user = UserDomain.createUser(newUser.email(), encodedPassword);
+            userService.saveUser(userMapper.domainToEntity(user));
+
             return jwtService.generateToken(user.getEmail(), user.getRole());
         } catch (IllegalArgumentException e) {
             throw e;

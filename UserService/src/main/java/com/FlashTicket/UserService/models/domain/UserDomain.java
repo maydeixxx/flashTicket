@@ -54,7 +54,7 @@ public class UserDomain {
 
     public void updatePassword(String newPasswordHash) {
         if (newPasswordHash == null) throw new IllegalArgumentException("New password is required");
-        this.passwordHash = passwordHash;
+        this.passwordHash = newPasswordHash;
         this.updatedAt = LocalDateTime.now();
     }
 

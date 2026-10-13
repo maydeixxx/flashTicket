@@ -1,6 +1,7 @@
 package com.FlashTicket.UserService.services.misc;
 
 import com.FlashTicket.UserService.models.domain.UserDomain;
+import com.FlashTicket.UserService.models.dtos.UserDto;
 import com.FlashTicket.UserService.models.entity.User;
 import org.springframework.stereotype.Component;
 
@@ -24,5 +25,15 @@ public class UserMapper {
         user.setCreatedAt(domain.getCreatedAt());
         user.setUpdatedAt(domain.getUpdatedAt());
         return user;
+    }
+
+    public UserDto entityToDto(User entity) {
+        return new UserDto(
+                entity.getId(),
+                entity.getEmail(),
+                entity.getRole(),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt()
+        );
     }
 }
