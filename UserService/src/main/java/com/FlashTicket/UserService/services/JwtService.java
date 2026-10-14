@@ -30,7 +30,7 @@ public class JwtService {
     public String generateToken(String email, Role role, UUID userId) {
         Map<String, Object> claims = new HashMap<>();
         claims.putIfAbsent("Role", role);
-        claims.putIfAbsent("UserId", userId);
+        claims.putIfAbsent("User_id", userId);
 
         return Jwts.builder()
                 .subject(email)

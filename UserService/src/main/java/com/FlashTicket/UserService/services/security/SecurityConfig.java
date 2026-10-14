@@ -19,7 +19,7 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final AuthFilter authFilter;
+    private final AuthHeaderFilter authFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity security) {
