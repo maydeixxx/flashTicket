@@ -7,6 +7,7 @@ import lombok.Getter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 public class EventDomain {
@@ -26,7 +27,7 @@ public class EventDomain {
         if (endsAt == null || endsAt.isBefore(startsAt)) throw new IllegalArgumentException("Please provide correct end time");
 
         this.id = id;
-        this.eventName = eventName;
+        this.eventName = eventName.toLowerCase();
         this.price = price;
         this.capacity = capacity;
         this.startsAt = startsAt;
@@ -35,6 +36,13 @@ public class EventDomain {
 
     public static EventDomain createEvent(String eventName, BigDecimal rawPrice, Integer capacity, LocalDateTime startsAt, LocalDateTime endsAt) {
         EventId id = EventId.generateId();
+        EventPrice price = new EventPrice(rawPrice);
+
+        return new EventDomain(id, eventName, price, capacity, startsAt, endsAt);
+    }
+
+    public static EventDomain restoreEvent(UUID rawId, String eventName, BigDecimal rawPrice, Integer capacity, LocalDateTime startsAt, LocalDateTime endsAt) {
+        EventId id = new EventId(rawId);
         EventPrice price = new EventPrice(rawPrice);
 
         return new EventDomain(id, eventName, price, capacity, startsAt, endsAt);
