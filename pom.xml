@@ -13,6 +13,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
+		<module>InventoryService</module>
 		<module>EurekaServer</module>
 		<module>GatewayService</module>
 		<module>UserService</module>
