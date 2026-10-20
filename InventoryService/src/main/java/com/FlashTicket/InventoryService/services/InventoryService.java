@@ -12,6 +12,7 @@ import com.FlashTicket.InventoryService.services.interfaces.EventUpdateStrategy;
 import com.FlashTicket.InventoryService.services.misc.EventMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -32,76 +33,44 @@ public class InventoryService {
         }
     }
 
+    @Transactional
     public void createEvent(CreateEventDTO dto) {
-        try {
-            EventDomain newEvent = EventDomain.createEvent(dto.eventName(), dto.price(), dto.capacity(), dto.startsAt(), dto.endsAt());
-            eventRepository.save(eventMapper.domainToEntity(newEvent));
-        } catch (IllegalArgumentException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error creating event [{}]: {}", dto.eventName(), e.getMessage());
-            throw new RuntimeException(e);
-        }
+        EventDomain newEvent = EventDomain.createEvent(dto.eventName(), dto.price(), dto.capacity(), dto.startsAt(), dto.endsAt());
+        eventRepository.save(eventMapper.domainToEntity(newEvent));
     }
 
+    @Transactional
     public void deleteEvent(UUID eventId) {
-        try {
-            if (eventId == null) throw new IllegalArgumentException("Provide correct id");
-            eventRepository.deleteById(eventId);
-        } catch (IllegalArgumentException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error deleting event [{}]: {}", eventId, e.getMessage());
-            throw new RuntimeException(e);
-        }
+        if (eventId == null) throw new IllegalArgumentException("Provide correct id");
+        eventRepository.deleteById(eventId);
     }
 
+    @Transactional
     public void updateEvent(UpdateEventDTO dto) {
-        try {
-            Event entity = eventRepository.findEventById(dto.eventId()).orElseThrow(() -> new EventNotFoundException("Event [%s] not found".formatted(dto.eventId())));
-            EventDomain event = eventMapper.entityToDomain(entity);
-            EventUpdateStrategy eventUpdateStrategy = updateStrategyMap.get(dto.typeOfUpdate().toLowerCase().trim());
+        Event entity = eventRepository.findEventById(dto.eventId()).orElseThrow(() -> new EventNotFoundException("Event [%s] not found".formatted(dto.eventId())));
+        EventDomain event = eventMapper.entityToDomain(entity);
+        EventUpdateStrategy eventUpdateStrategy = updateStrategyMap.get(dto.typeOfUpdate().toLowerCase().trim());
 
-            if (eventUpdateStrategy == null) throw new UpdateStrategyNotFoundException("Update strategy [%s] not found".formatted(dto.typeOfUpdate()));
-            eventUpdateStrategy.updateEvent(event, dto);
+        if (eventUpdateStrategy == null)
+            throw new UpdateStrategyNotFoundException("Update strategy [%s] not found".formatted(dto.typeOfUpdate()));
+        eventUpdateStrategy.updateEvent(event, dto);
 
-            eventRepository.save(eventMapper.domainToEntity(event));
-        } catch (IllegalArgumentException | EventNotFoundException | UpdateStrategyNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error updating event [{}]: {}", dto.eventId(), e.getMessage());
-            throw new RuntimeException(e);
-        }
+        eventRepository.save(eventMapper.domainToEntity(event));
     }
 
     public List<EventDTO> getEvents() {
-        try {
-            return eventRepository.findAll().stream()
-                    .map(eventMapper::entityToDto)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Unexpected error getting events: {}", e.getMessage());
-            throw new RuntimeException(e);
-        }
+        return eventRepository.findAll().stream()
+                .map(eventMapper::entityToDto)
+                .toList();
     }
 
     public List<EventDTO> getEventsByName(String name) {
-        try {
-            return eventRepository.findEventsByEventName(name).stream()
-                    .map(eventMapper::entityToDto)
-                    .toList();
-        } catch (Exception e) {
-            log.error("Unexpected error getting events by name - [{}]: {}", name, e.getMessage());
-            throw new RuntimeException(e);
-        }
+        return eventRepository.findEventsByEventName(name).stream()
+                .map(eventMapper::entityToDto)
+                .toList();
     }
 
     public EventDTO getEventById(UUID id) {
-        try {
-            return eventMapper.entityToDto(eventRepository.findEventById(id).orElseThrow(() -> new EventNotFoundException("Event [%s] not found".formatted(id))));
-        } catch (Exception e) {
-            log.error("Unexpected error getting event [{}]: {}", id, e.getMessage());
-            throw new RuntimeException(e);
-        }
+        return eventMapper.entityToDto(eventRepository.findEventById(id).orElseThrow(() -> new EventNotFoundException("Event [%s] not found".formatted(id))));
     }
 }
